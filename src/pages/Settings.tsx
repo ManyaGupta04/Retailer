@@ -11,12 +11,6 @@ export default function Settings() {
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
     const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
 
-    // Show toast notification
-    const showToast = (message: string, type: 'error' | 'success' = 'error') => {
-        setToast({ message, type });
-        setTimeout(() => setToast(null), 3000);
-    };
-
     // Shop settings
     const [shopName, setShopName] = useState('');
     const [shopAddress, setShopAddress] = useState('');
