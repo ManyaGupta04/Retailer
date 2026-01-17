@@ -1,0 +1,199 @@
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 1rem;
+}
+
+.modal-content {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.modal-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.modal-close {
+    width: 36px;
+    height: 36px;
+    background: rgba(148, 163, 184, 0.2);
+    border: none;
+    border-radius: 8px;
+    color: #64748b;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #dc2626;
+}
+
+.product-form {
+    padding: 1.5rem;
+}
+
+.product-form .form-group {
+    margin-bottom: 1.25rem;
+}
+
+.product-form label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #334155;
+    margin-bottom: 0.5rem;
+}
+
+.product-form input,
+.product-form select {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: rgba(241, 245, 249, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    border-radius: 12px;
+    color: #1e293b;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.product-form input:focus,
+.product-form select:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.product-form input::placeholder {
+    color: #94a3b8;
+}
+
+.product-form select {
+    cursor: pointer;
+}
+
+.product-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 480px) {
+    .product-form .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.stock-switch {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.switch-option {
+    flex: 1;
+    padding: 0.75rem;
+    background: rgba(241, 245, 249, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    border-radius: 10px;
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.switch-option.active {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.5);
+    color: #10b981;
+}
+
+.switch-option.active.out {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #dc2626;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.cancel-btn,
+.submit-btn {
+    flex: 1;
+    padding: 1rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cancel-btn {
+    background: rgba(148, 163, 184, 0.2);
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    color: #475569;
+}
+
+.cancel-btn:hover {
+    background: rgba(148, 163, 184, 0.3);
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border: none;
+    color: white;
+}
+
+.submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+}
+
+.submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
