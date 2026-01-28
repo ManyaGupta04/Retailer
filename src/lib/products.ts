@@ -86,13 +86,12 @@ export const catalogProducts: CatalogProduct[] = [
     { id: 'spice-015', name: 'Carom Seeds', name_hi: 'अजवाइन', category: 'spices', defaultUnit: 'g', defaultPrice: 35, image: 'https://www.indianasapplepie.com/cdn/shop/articles/IMG-1246_1_7a29cb04-6c1d-4529-9292-0f6b264d61a0_2000x.jpg?v=1748286425' },
 
     // Oils & Ghee (8 products)
-    { id: 'oil-001', name: 'Mustard Oil', name_hi: 'सरसों का तेल', category: 'oils', defaultUnit: 'L', defaultPrice: 180, image: 'https://www.bigbasket.com/pd/276764/fortune-fortune-premium-kachi-ghani-pure-mustard-oil-500-ml-bottle/' },
-    { id: 'oil-002', name: 'Sunflower Oil', name_hi: 'सूरजमुखी तेल', category: 'oils', defaultUnit: 'L', defaultPrice: 150, image: 'https://gropharm.in/product/fortune-sunflower-oil-1-ltr/' },
-    { id: 'oil-003', name: 'Groundnut Oil', name_hi: 'मूंगफली तेल', category: 'oils', defaultUnit: 'L', defaultPrice: 200, image: 'https://www.amazon.in/Fortune-Filtered-Groundnut-Oil-LTR/dp/B085D9NPK7' },
+    { id: 'oil-001', name: 'Mustard Oil', name_hi: 'सरसों का तेल', category: 'oils', defaultUnit: 'L', defaultPrice: 180, image: 'https://blsmart.in/wp-content/uploads/2022/02/WhatsApp-Image-2021-09-03-at-5.18.12-PM.jpeg' },
+    { id: 'oil-002', name: 'Sunflower Oil', name_hi: 'सूरजमुखी तेल', category: 'oils', defaultUnit: 'L', defaultPrice: 150, image: 'https://instamart-media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,h_600/NI_CATALOG/IMAGES/CIW/2025/8/8/f1a45371-e3a0-40bc-a00e-ea5e408dfd55_1766_1.png' },
+    { id: 'oil-003', name: 'Groundnut Oil', name_hi: 'मूंगफली तेल', category: 'oils', defaultUnit: 'L', defaultPrice: 200, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtPo6co1iPCwsWQDSdeU7xFwhXa0L_nxQNrw&s' },
     { id: 'oil-004', name: 'Coconut Oil', name_hi: 'नारियल तेल', category: 'oils', defaultUnit: 'L', defaultPrice: 220, image: 'https://m.media-amazon.com/images/I/51yzcfI2TfL._SY300_SX300_QL70_FMwebp_.jpg' },
-    { id: 'oil-005', name: 'Soybean Oil', name_hi: 'सोयाबीन तेल', category: 'oils', defaultUnit: 'L', defaultPrice: 140, image: 'https://www.amazon.in/Fortune-Soyabean-Oil-1L-Pouch/dp/B077JSNDWF' },
+    { id: 'oil-005', name: 'Soybean Oil', name_hi: 'सोयाबीन तेल', category: 'oils', defaultUnit: 'L', defaultPrice: 140, image: 'https://rukminim2.flixcart.com/image/480/640/xif0q/edible-oil/k/p/c/-original-imahadwr8ketn3du.jpeg?q=20' },
     { id: 'oil-006', name: 'Olive Oil', name_hi: 'जैतून का तेल', category: 'oils', defaultUnit: 'mL', defaultPrice: 400, image: 'https://m.media-amazon.com/images/I/61q7gMCVw8L._SL1500_.jpg' },
-    { id: 'oil-007', name: 'Refined Oil', name_hi: 'रिफाइंड तेल', category: 'oils', defaultUnit: 'L', defaultPrice: 130, image: 'https://images.unsplash.com/photo-1593351799227-75df2026356b?w=200&h=200&fit=crop' },
     { id: 'oil-008', name: 'Ghee', name_hi: 'घी', category: 'oils', defaultUnit: 'kg', defaultPrice: 150, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRObjfTR7r3rj0A1QmAxXQiD5rxHXFvbocElQ&s' },
 
     // Snacks (10 products)
