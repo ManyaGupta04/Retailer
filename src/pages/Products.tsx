@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 import { catalogProducts, type CatalogProduct } from '../lib/products';
 import { categories } from '../lib/categories';
 import { speakPriceSet, speakProductPublished, speakProductUnpublished } from '../lib/speech';
+import { fetchCompetitorPrices, type CompetitorPricesMap } from '../lib/competitorPriceService';
 import Sidebar from '../components/Sidebar';
 import './Products.css';
 
@@ -29,6 +30,8 @@ export default function Products() {
     const [stockFilter, setStockFilter] = useState<'all' | 'selected' | 'instock' | 'outofstock'>('all');
     // Store custom prices for each product (keyed by catalog product id)
     const [customPrices, setCustomPrices] = useState<{ [key: string]: string }>({});
+    // Store competitor prices for products
+    const [competitorPrices, setCompetitorPrices] = useState<CompetitorPricesMap>({});
 
     // Create a map of catalog_id to retailer product for quick lookup
     const retailerProductMap = useMemo(() => {
@@ -93,6 +96,13 @@ export default function Products() {
 
             if (error) throw error;
             setRetailerProducts(data || []);
+
+            // Fetch competitor prices for the retailer's products
+            if (data && data.length > 0 && retailer) {
+                const catalogIds = data.map(p => p.catalog_id);
+                const prices = await fetchCompetitorPrices(catalogIds, retailer.id);
+                setCompetitorPrices(prices);
+            }
         } catch (error) {
             console.error('Error fetching products:', error);
         } finally {
@@ -382,6 +392,24 @@ export default function Products() {
                                                     <div className="product-info">
                                                         <span className="product-name">{catalogProduct.name}</span>
                                                         <span className="product-name-hi">{catalogProduct.name_hi}</span>
+                                                        {/* Show competitor prices for selected products */}
+                                                        {isSelected && competitorPrices[catalogProduct.id] && competitorPrices[catalogProduct.id].length > 0 && (
+                                                            <div className="competitor-prices">
+                                                                <span className="competitor-label">🏪 Others:</span>
+                                                                {competitorPrices[catalogProduct.id].slice(0, 3).map((cp, index) => (
+                                                                    <span
+                                                                        key={cp.retailer_id}
+                                                                        className={`competitor-price ${cp.price < currentPriceNum ? 'lower' : cp.price > currentPriceNum ? 'higher' : 'same'}`}
+                                                                    >
+                                                                        {cp.shop_name}: ₹{cp.price}
+                                                                        {index < Math.min(competitorPrices[catalogProduct.id].length, 3) - 1 && ', '}
+                                                                    </span>
+                                                                ))}
+                                                                {competitorPrices[catalogProduct.id].length > 3 && (
+                                                                    <span className="competitor-more">+{competitorPrices[catalogProduct.id].length - 3} more</span>
+                                                                )}
+                                                            </div>
+                                                        )}
                                                     </div>
 
                                                     <div className="product-price-input">

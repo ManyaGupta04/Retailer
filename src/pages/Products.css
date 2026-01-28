@@ -258,6 +258,48 @@
     color: #64748b;
 }
 
+/* Competitor Prices */
+.competitor-prices {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+    font-size: 0.7rem;
+    color: #64748b;
+}
+
+.competitor-label {
+    font-weight: 500;
+    color: #94a3b8;
+}
+
+.competitor-price {
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    background: rgba(148, 163, 184, 0.1);
+}
+
+.competitor-price.lower {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.competitor-price.higher {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.competitor-price.same {
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.competitor-more {
+    font-style: italic;
+    color: #94a3b8;
+}
+
 /* Product Price Input */
 .product-price-input {
     display: flex;

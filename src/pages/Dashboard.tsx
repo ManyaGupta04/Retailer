@@ -6,6 +6,7 @@ import type { Product } from '../types';
 import Sidebar from '../components/Sidebar';
 import { getPlatformFeeStatus, payPlatformFees, formatVisibilityExpiry, autoExtendVisibilityIfNoFees } from '../lib/platformFeeService';
 import type { PlatformFeeStatus } from '../lib/platformFeeService';
+import { PLATFORM_FEE_ENABLED } from '../lib/platformFeeConfig';
 import './Dashboard.css';
 
 export default function Dashboard() {
@@ -38,7 +39,10 @@ export default function Dashboard() {
     useEffect(() => {
         if (retailer) {
             fetchStats();
-            fetchPlatformFeeStatus();
+            // Only fetch platform fee status if enabled
+            if (PLATFORM_FEE_ENABLED) {
+                fetchPlatformFeeStatus();
+            }
         } else {
             setLoading(false);
         }
@@ -118,8 +122,8 @@ export default function Dashboard() {
                     </div>
                 ) : (
                     <>
-                        {/* Platform Fee Card - Prominent at top */}
-                        {platformFeeStatus && (
+                        {/* Platform Fee Card - Prominent at top (only if enabled) */}
+                        {PLATFORM_FEE_ENABLED && platformFeeStatus && (
                             <div className={`platform-fee-card ${platformFeeStatus.isVisible ? 'visible' : 'hidden'}`}>
                                 <div className="platform-fee-header">
                                     <div className="platform-fee-icon">💰</div>
