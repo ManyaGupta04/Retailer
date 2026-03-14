@@ -10,6 +10,7 @@ export type Retailer = {
   closing_time?: string;
   allows_pickup?: boolean;
   allows_delivery?: boolean;
+  city?: string;
 };
 
 export type Product = {

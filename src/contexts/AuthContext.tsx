@@ -9,7 +9,7 @@ interface AuthContextType {
     session: Session | null;
     retailer: Retailer | null;
     loading: boolean;
-    signUp: (email: string, password: string, shopName: string, shopAddress?: string, phone?: string) => Promise<{ error: Error | null }>;
+    signUp: (email: string, password: string, shopName: string, shopAddress?: string, phone?: string, city?: string) => Promise<{ error: Error | null }>;
     signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
     signOut: () => Promise<void>;
     refreshRetailer: () => Promise<void>;
@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const signUp = async (email: string, password: string, shopName: string, shopAddress?: string, phone?: string) => {
+    const signUp = async (email: string, password: string, shopName: string, shopAddress?: string, phone?: string, city?: string) => {
         try {
             // Pass shop info as user metadata - the database trigger will create the retailer profile
             const { error } = await supabase.auth.signUp({
@@ -104,6 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                         shop_name: shopName,
                         shop_address: shopAddress || null,
                         phone: phone || null,
+                        city: city || 'prayagraj',
                     }
                 }
             });

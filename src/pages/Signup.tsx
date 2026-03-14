@@ -9,6 +9,7 @@ export default function Signup() {
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [shopAddress, setShopAddress] = useState('');
+    const [city, setCity] = useState('prayagraj');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
@@ -72,7 +73,7 @@ export default function Signup() {
         // Format phone for storage (add +91 prefix if 10 digits)
         const formattedPhone = phone ? `+91${phone}` : '';
 
-        const { error } = await signUp(email, password, shopName, shopAddress, formattedPhone);
+        const { error } = await signUp(email, password, shopName, shopAddress, formattedPhone, city);
 
         if (error) {
             setError(error.message);
@@ -167,6 +168,30 @@ export default function Signup() {
                             onChange={(e) => setShopAddress(e.target.value)}
                             placeholder="123 Market Street, City"
                         />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="city">City *</label>
+                        <select
+                            id="city"
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                            required
+                            style={{
+                                width: '100%',
+                                padding: '0.75rem 1rem',
+                                borderRadius: '12px',
+                                border: '1px solid rgba(255,255,255,0.2)',
+                                background: 'rgba(255,255,255,0.08)',
+                                color: 'inherit',
+                                fontSize: '0.95rem',
+                                outline: 'none',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            <option value="prayagraj">Allahabad / Prayagraj</option>
+                            <option value="bangalore">Bangalore</option>
+                        </select>
                     </div>
 
                     <div className="form-group">

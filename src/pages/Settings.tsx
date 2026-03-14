@@ -20,6 +20,7 @@ export default function Settings() {
     const [closingTime, setClosingTime] = useState('9:00 PM');
     const [allowsPickup, setAllowsPickup] = useState(true);
     const [allowsDelivery, setAllowsDelivery] = useState(true);
+    const [city, setCity] = useState('prayagraj');
 
     // Load current settings
     useEffect(() => {
@@ -32,6 +33,7 @@ export default function Settings() {
             setClosingTime(retailer.closing_time || '9:00 PM');
             setAllowsPickup(retailer.allows_pickup ?? true);
             setAllowsDelivery(retailer.allows_delivery ?? true);
+            setCity(retailer.city || 'prayagraj');
         }
     }, [retailer]);
 
@@ -59,6 +61,7 @@ export default function Settings() {
                     closing_time: closingTime,
                     allows_pickup: allowsPickup,
                     allows_delivery: allowsDelivery,
+                    city: city,
                 })
                 .eq('id', user.id);
 
@@ -145,6 +148,29 @@ export default function Settings() {
                                 placeholder="https://maps.google.com/..."
                             />
                             <span className="input-hint">Paste your Google Maps share link for directions</span>
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="city">📍 City</label>
+                            <select
+                                id="city"
+                                value={city}
+                                onChange={(e) => setCity(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '0.75rem 1rem',
+                                    borderRadius: '12px',
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    background: 'rgba(255,255,255,0.08)',
+                                    color: 'inherit',
+                                    fontSize: '0.95rem',
+                                    outline: 'none',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                <option value="prayagraj">Allahabad / Prayagraj</option>
+                                <option value="bangalore">Bangalore</option>
+                            </select>
                         </div>
                     </section>
 

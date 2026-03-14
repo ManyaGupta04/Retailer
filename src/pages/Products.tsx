@@ -72,20 +72,23 @@ export default function Products() {
     }, [retailer]);
 
     // Initialize custom prices from retailer products when they load
+    // Only sync prices from database for products that user hasn't edited
     useEffect(() => {
-        const prices: { [key: string]: string } = {};
-        // First, load prices from retailer's saved products
-        retailerProducts.forEach(product => {
-            prices[product.catalog_id] = product.price.toString();
-        });
-        // Set default prices for products that haven't been selected yet
+        // Build new prices object
+        const newPrices: { [key: string]: string } = {};
+
+        // First, set all catalog products to their default prices
         catalogProducts.forEach(cp => {
-            if (prices[cp.id] === undefined) {
-                prices[cp.id] = cp.defaultPrice.toString();
-            }
+            newPrices[cp.id] = cp.defaultPrice.toString();
         });
-        setCustomPrices(prices);
-    }, [retailerProducts]);
+
+        // Then override with retailer's saved prices
+        retailerProducts.forEach(product => {
+            newPrices[product.catalog_id] = product.price.toString();
+        });
+
+        setCustomPrices(newPrices);
+    }, [retailerProducts.length]); // Only run when product count changes, not on every update
 
     const fetchRetailerProducts = async () => {
         try {
@@ -98,9 +101,9 @@ export default function Products() {
             setRetailerProducts(data || []);
 
             // Fetch competitor prices for the retailer's products
-            if (data && data.length > 0 && retailer) {
+            if (data && data.length > 0 && retailer && retailer.city) {
                 const catalogIds = data.map(p => p.catalog_id);
-                const prices = await fetchCompetitorPrices(catalogIds, retailer.id);
+                const prices = await fetchCompetitorPrices(catalogIds, retailer.id, retailer.city);
                 setCompetitorPrices(prices);
             }
         } catch (error) {

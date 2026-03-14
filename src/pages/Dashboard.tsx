@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import type { Product } from '../types';
+import type { Product, Order } from '../types';
 import Sidebar from '../components/Sidebar';
 import { getPlatformFeeStatus, payPlatformFees, formatVisibilityExpiry, autoExtendVisibilityIfNoFees } from '../lib/platformFeeService';
 import type { PlatformFeeStatus } from '../lib/platformFeeService';
@@ -28,6 +28,11 @@ export default function Dashboard() {
     const [paymentLoading, setPaymentLoading] = useState(false);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
+    // Active orders state for notifications
+    const [activeOrders, setActiveOrders] = useState<Order[]>([]);
+    const pendingOrdersCount = activeOrders.filter(o => o.status === 'pending').length;
+    const ongoingOrdersCount = activeOrders.filter(o => o.status === 'ongoing').length;
+
     // Auto-hide toast after 4 seconds
     useEffect(() => {
         if (toast) {
@@ -47,6 +52,70 @@ export default function Dashboard() {
             setLoading(false);
         }
     }, [retailer]);
+
+    // Fetch and subscribe to active orders for dashboard notifications
+    useEffect(() => {
+        if (!retailer?.id) return;
+
+        // Fetch initial active orders (pending and ongoing)
+        const fetchActiveOrders = async () => {
+            const { data, error } = await supabase
+                .from('orders')
+                .select('*')
+                .eq('retailer_id', retailer.id)
+                .in('status', ['pending', 'ongoing'])
+                .order('created_at', { ascending: false });
+
+            if (!error && data) {
+                setActiveOrders(data);
+            }
+        };
+
+        fetchActiveOrders();
+
+        // Subscribe to real-time order updates
+        const channel = supabase
+            .channel('dashboard-order-notifications')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'orders',
+                    filter: `retailer_id=eq.${retailer.id}`
+                },
+                (payload) => {
+                    if (payload.eventType === 'INSERT') {
+                        const newOrder = payload.new as Order;
+                        if (newOrder.status === 'pending' || newOrder.status === 'ongoing') {
+                            setActiveOrders(prev => [newOrder, ...prev]);
+                        }
+                    } else if (payload.eventType === 'UPDATE') {
+                        const updatedOrder = payload.new as Order;
+                        if (updatedOrder.status === 'pending' || updatedOrder.status === 'ongoing') {
+                            // Update or add to active orders
+                            setActiveOrders(prev => {
+                                const exists = prev.find(o => o.id === updatedOrder.id);
+                                if (exists) {
+                                    return prev.map(o => o.id === updatedOrder.id ? updatedOrder : o);
+                                }
+                                return [updatedOrder, ...prev];
+                            });
+                        } else {
+                            // Remove from active orders if completed/cancelled
+                            setActiveOrders(prev => prev.filter(o => o.id !== updatedOrder.id));
+                        }
+                    } else if (payload.eventType === 'DELETE') {
+                        setActiveOrders(prev => prev.filter(o => o.id !== payload.old.id));
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [retailer?.id]);
 
     const fetchStats = async () => {
         try {
@@ -115,6 +184,36 @@ export default function Dashboard() {
                         <p>Here's an overview of your store</p>
                     </div>
                 </header>
+
+                {/* Order Notification Banners - Always visible when there are active orders */}
+                {(pendingOrdersCount > 0 || ongoingOrdersCount > 0) && (
+                    <div className="order-notification-section">
+                        {pendingOrdersCount > 0 && (
+                            <div className="order-notification-banner pending" onClick={() => navigate('/orders')}>
+                                <div className="banner-icon">🔔</div>
+                                <div className="banner-content">
+                                    <span className="banner-title">
+                                        {pendingOrdersCount} New Order{pendingOrdersCount > 1 ? 's' : ''} Waiting!
+                                    </span>
+                                    <span className="banner-subtitle">Tap to view and accept</span>
+                                </div>
+                                <span className="banner-arrow">→</span>
+                            </div>
+                        )}
+                        {ongoingOrdersCount > 0 && (
+                            <div className="order-notification-banner ongoing" onClick={() => navigate('/orders')}>
+                                <div className="banner-icon">📦</div>
+                                <div className="banner-content">
+                                    <span className="banner-title">
+                                        {ongoingOrdersCount} Active Order{ongoingOrdersCount > 1 ? 's' : ''} in Progress
+                                    </span>
+                                    <span className="banner-subtitle">Tap to manage orders</span>
+                                </div>
+                                <span className="banner-arrow">→</span>
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {loading ? (
                     <div className="loading-container">

@@ -11,10 +11,7 @@ export interface CompetitorPricesMap {
     [catalogId: string]: CompetitorPrice[];
 }
 
-// Cache for competitor prices
-let competitorPricesCache: CompetitorPricesMap | null = null;
-let cacheTimestamp: number = 0;
-const CACHE_DURATION = 60000; // 1 minute cache
+// Removed global cache variables to ensure fresh data is always fetched
 
 /**
  * Fetch competitor prices for products
@@ -22,24 +19,16 @@ const CACHE_DURATION = 60000; // 1 minute cache
  */
 export async function fetchCompetitorPrices(
     catalogIds: string[],
-    currentRetailerId: string
+    currentRetailerId: string,
+    currentCity: string
 ): Promise<CompetitorPricesMap> {
     if (catalogIds.length === 0) {
         return {};
     }
 
-    // Check cache validity
-    const now = Date.now();
-    if (competitorPricesCache && (now - cacheTimestamp) < CACHE_DURATION) {
-        // Filter cached results for requested catalog IDs
-        const filteredCache: CompetitorPricesMap = {};
-        for (const catalogId of catalogIds) {
-            if (competitorPricesCache[catalogId]) {
-                filteredCache[catalogId] = competitorPricesCache[catalogId];
-            }
-        }
-        return filteredCache;
-    }
+    // Note: We removed the old global cache here because it was causing a bug where 
+    // newly selected products would not show competitor prices until the cache expired.
+    // If caching is needed, it must track which specific catalog_ids have been fetched.
 
     try {
         // Fetch all products from other retailers for the given catalog IDs
@@ -65,11 +54,12 @@ export async function fetchCompetitorPrices(
         // Get unique retailer IDs to fetch shop names
         const retailerIds = [...new Set(productsData.map(p => p.retailer_id))];
 
-        // Fetch retailer names
+        // Fetch retailer names and filter by the current city
         const { data: retailersData, error: retailersError } = await supabase
             .from('retailers')
             .select('id, shop_name')
-            .in('id', retailerIds);
+            .in('id', retailerIds)
+            .eq('city', currentCity);
 
         if (retailersError) {
             console.error('Error fetching retailer names:', retailersError);
@@ -90,13 +80,16 @@ export async function fetchCompetitorPrices(
             const catalogId = item.catalog_id;
             if (!catalogId) continue;
 
+            const shopName = retailerNameMap.get(item.retailer_id);
+            if (!shopName) continue; // Skip products from retailers in other cities
+
             if (!result[catalogId]) {
                 result[catalogId] = [];
             }
 
             result[catalogId].push({
                 retailer_id: item.retailer_id,
-                shop_name: retailerNameMap.get(item.retailer_id) || 'Unknown Shop',
+                shop_name: shopName,
                 price: item.price
             });
         }
@@ -105,10 +98,6 @@ export async function fetchCompetitorPrices(
         for (const catalogId of Object.keys(result)) {
             result[catalogId].sort((a, b) => a.price - b.price);
         }
-
-        // Update cache
-        competitorPricesCache = result;
-        cacheTimestamp = now;
 
         console.log('Competitor prices result:', result);
         return result;
@@ -119,11 +108,10 @@ export async function fetchCompetitorPrices(
 }
 
 /**
- * Clear the competitor prices cache
+ * Clear the competitor prices cache (No-op now that global cache is removed)
  */
 export function clearCompetitorPricesCache(): void {
-    competitorPricesCache = null;
-    cacheTimestamp = 0;
+    // No-op
 }
 
 /**

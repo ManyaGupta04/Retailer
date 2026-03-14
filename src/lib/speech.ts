@@ -44,6 +44,9 @@ const loadVoices = (): Promise<SpeechSynthesisVoice[]> => {
     });
 };
 
+// Store ongoing utterances so they don't get garbage collected before playing
+let currentUtterance: SpeechSynthesisUtterance | null = null;
+
 // Core function to speak Hindi text
 export const speakHindi = async (text: string): Promise<void> => {
     return new Promise((resolve) => {
@@ -71,38 +74,51 @@ export const speakHindi = async (text: string): Promise<void> => {
             window.speechSynthesis.cancel();
 
             const utterance = new SpeechSynthesisUtterance(text);
+            currentUtterance = utterance; // Keep reference to prevent GC
             utterance.lang = 'hi-IN'; // Hindi (India)
             utterance.rate = 0.9;
             utterance.pitch = 1.0;
             utterance.volume = 1.0;
 
-            // Try to find a Hindi voice, or use default
-            const hindiVoice = voicesList.find(voice =>
+            // Try to find a female Hindi voice first, then any Hindi voice
+            const hindiVoices = voicesList.filter(voice =>
                 voice.lang.includes('hi') ||
                 voice.lang.includes('Hindi') ||
                 voice.name.toLowerCase().includes('hindi')
             );
 
-            if (hindiVoice) {
-                utterance.voice = hindiVoice;
-                console.log('Using Hindi voice:', hindiVoice.name);
+            // Prefer female Hindi voice
+            const femaleHindiVoice = hindiVoices.find(v =>
+                v.name.toLowerCase().includes('female') ||
+                v.name.toLowerCase().includes('woman') ||
+                v.name.includes('Heera') ||
+                v.name.includes('Swara') ||
+                v.name.includes('Lekha') ||
+                v.name.includes('Google हिन्दी')
+            );
+
+            if (femaleHindiVoice) {
+                utterance.voice = femaleHindiVoice;
+                console.log('Using female Hindi voice:', femaleHindiVoice.name);
+            } else if (hindiVoices.length > 0) {
+                // Use last Hindi voice (often female in browser voice lists)
+                const lastHindi = hindiVoices[hindiVoices.length - 1];
+                utterance.voice = lastHindi;
+                console.log('Using Hindi voice:', lastHindi.name);
             } else {
-                // Use Google Hindi if available, or first available voice
-                const googleVoice = voicesList.find(v => v.name.includes('Google'));
-                if (googleVoice) {
-                    utterance.voice = googleVoice;
-                }
                 console.log('No Hindi voice found, using default');
             }
 
             // Resolve when speech ends
             utterance.onend = () => {
                 console.log('Speech ended:', text);
+                currentUtterance = null; // Clear reference
                 resolve();
             };
 
             utterance.onerror = (event) => {
                 console.error('Speech error:', event);
+                currentUtterance = null; // Clear reference
                 resolve();
             };
 
@@ -184,21 +200,21 @@ const numberToHindiWords = (num: number): string => {
 // Speak when a price is set: "*product name* Ka daaam *price in Hindi* rupaye set Kiya Gaya"
 export const speakPriceSet = (productName: string, price: number) => {
     const priceInHindi = numberToHindiWords(price);
-    const text = `${productName} Ka daaam ${priceInHindi} rupaye set Kiya Gaya`;
+    const text = `${productName} का दाम ${priceInHindi} रुपये सेट किया गया`;
     console.log('Speaking price set:', text);
     speakHindi(text);
 };
 
 // Speak when a product is published: "*product name* store mein joda Gaya"
 export const speakProductPublished = (productName: string) => {
-    const text = `${productName} store mein joda Gaya`;
+    const text = `${productName} स्टोर में जोड़ा गया`;
     console.log('Speaking product published:', text);
     speakHindi(text);
 };
 
 // Speak when a product is unpublished: "*product name* store se hataya gaya"
 export const speakProductUnpublished = (productName: string) => {
-    const text = `${productName} store se hataya gaya`;
+    const text = `${productName} स्टोर से हटाया गया`;
     console.log('Speaking product unpublished:', text);
     speakHindi(text);
 };
@@ -207,7 +223,7 @@ export const speakProductUnpublished = (productName: string) => {
 export const speakOrderReceived = async () => {
     console.log('Speaking order received announcement (3 times)');
     for (let i = 0; i < 3; i++) {
-        await speakHindi('order Aaya');
+        await speakHindi('ऑर्डर आया');
         // Small pause between repetitions
         await new Promise(resolve => setTimeout(resolve, 500));
     }
@@ -215,7 +231,7 @@ export const speakOrderReceived = async () => {
 
 // Speak when an order is completed: "Shandaar! order pura hua"
 export const speakOrderCompleted = () => {
-    const text = 'Shandaar! order pura hua';
+    const text = 'शानदार! ऑर्डर पूरा हुआ';
     console.log('Speaking order completed:', text);
     speakHindi(text);
 };
